@@ -1,0 +1,37 @@
+<simulation verbosity="medium">
+   <output prefix='vacancy'>
+      <properties stride='10' filename='out'>  [ step, time{picosecond}, conserved, temperature{kelvin}, potential, pot_component_raw(0), pot_component_raw(1), ensemble_bias, ensemble_temperature{kelvin} ] </properties>
+      <trajectory filename='pos' stride='1000' bead='0' format='xyz' cell_units='angstrom'> positions{angstrom} </trajectory>
+   </output>
+   <total_steps>2000000</total_steps>
+   <prng><seed>85556</seed></prng>
+   <ffsocket name="lmpserial1" mode="unix" pbc="true">
+      <address>npt-100K</address>
+   </ffsocket>
+   <ffdebye name="debye">
+     <hessian mode="file" shape='(747,747)'> debye.hessian </hessian>
+     <x_reference mode="file" units="angstrom"> debye.geo </x_reference>
+   </ffdebye>
+   <system>
+   <initialize nbeads='1'> 
+      <file mode='xyz'> start.xyz </file>
+      <velocities mode="thermal" units='kelvin'> 200 </velocities>
+   </initialize>
+   <forces>
+   <force forcefield="debye" weight="1"> </force>
+   <force forcefield="lmpserial1" weight="0"> </force>  
+   </forces>
+   <motion mode="dynamics">
+   <dynamics mode='nvt'>
+      <thermostat mode='langevin'>
+         <tau units='femtosecond'>100</tau>
+      </thermostat>
+      <timestep units='femtosecond'> 1  </timestep>
+    </dynamics> <fixcom> True </fixcom>
+     </motion>
+     <ensemble>
+      <temperature units='kelvin'> 100 </temperature>
+      <pressure units='megapascal'> 1e-10 </pressure>
+   </ensemble>
+</system>
+</simulation>

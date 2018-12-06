@@ -1,0 +1,33 @@
+<simulation verbosity="medium">
+   <output prefix='perfect'>
+      <properties stride='1' filename='out'>  [ step, time{picosecond}, conserved, temperature{kelvin}, potential, pressure_md, volume, cell_h ] </properties>
+      <trajectory filename='pos' stride='1' bead='0' format='xyz' cell_units='angstrom'> positions{angstrom} </trajectory>
+   </output>
+   <total_steps>1000000</total_steps>
+   <prng><seed>832346</seed></prng>
+   <ffsocket name="lmpserial1" mode="unix" pbc="true">
+      <address>npt-100K</address>
+   </ffsocket>
+   <system>
+   <initialize nbeads='1'> 
+      <file mode='xyz'> start.xyz </file>
+      <cell mode='abc' units='angstrom'> [ 14.277, 14.277, 14.277 ] </cell>
+      <velocities mode="thermal" units='kelvin'> 800 </velocities>
+   </initialize>
+   <forces>
+   <force forcefield="lmpserial1"> </force>
+   </forces>
+      <motion mode="vibrations">
+        <vibrations mode="fd">
+            <pos_shift> 0.001 </pos_shift>
+            <energy_shift> 0.0009500 </energy_shift>
+            <prefix> perfect-fd </prefix>
+            <asr> crystal </asr>
+         </vibrations>
+      </motion>
+     <ensemble>
+      <temperature units='kelvin'> 800 </temperature>
+      <pressure units='megapascal'> 1e-10 </pressure>
+   </ensemble>
+</system>
+</simulation>

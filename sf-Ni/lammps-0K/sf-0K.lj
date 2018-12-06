@@ -1,0 +1,63 @@
+# Input file for Stack Fault Energy surface of Nickel
+# Richard Glaze, 2014
+# --------------------- INITIALIZAITION ---------------------
+clear
+units		metal
+dimension	3
+boundary	p p p
+atom_style	atomic
+variable latparam1 equal 3.52
+variable x_displace equal -1*(${latparam1}/sqrt(6))
+variable xdim equal ${latparam1}*sqrt(6)/2*6
+variable ydim equal ${latparam1}*sqrt(2)/2*10
+variable totlayer equal 11
+variable cutlayer equal 6
+variable zdim equal ${latparam1}/sqrt(3)*${totlayer}
+variable zcut equal ${latparam1}/sqrt(3)*${cutlayer}+1.0
+
+variable systemp equal 0
+
+# --------------------- ATOM DEFINITION ---------------------
+lattice		fcc ${latparam1}
+region		1 block -.001 ${xdim} -.001 ${ydim} -.001 ${zcut} units box
+region 		2 block -.001 ${xdim} -.001 ${ydim} ${zcut} ${zdim} units box
+region		whole block 0 ${xdim} 0 ${ydim} 0 ${zdim} units box
+#the -.001 in the -x and -y and lower limit of region 1 are only to overcome a simple numerical issue but can be considered 0
+create_box 	2 whole
+lattice fcc ${latparam1} orient x 1 1 2 orient y -1 1 0 orient z -1 -1 1
+create_atoms	1 region 1
+lattice fcc ${latparam1} orient x 1 1 2 orient y -1 1 0 orient z -1 -1 1
+create_atoms 	2 region 2 
+
+# Creat a SF layer
+group bot region 1
+group top region 2
+displace_atoms top move ${x_displace} 0.0 0.0 units box
+
+# --------------------- FORCE FIELDS ---------------------
+# ---------- Define Interatomic Potential --------------------- 
+pair_style	eam/alloy
+pair_coeff * * ../FeCuNi.eam.alloy Ni Ni
+
+neighbor    0.3 bin                ## define parameters for neighbor list
+neigh_modify    delay 0 every 1 check yes
+
+thermo 1
+thermo_style custom step temp pe enthalpy lx ly lz atoms press pxx pyy pzz pxy pyz pxz
+
+# ---------- EQUILIBRATION -------------------------
+fix 1 all box/relax aniso 0.0 vmax 0.0001
+
+min_style cg
+minimize 1e-20 1e-20 10000 10000
+min_style sd
+minimize 1e-40 1e-40 10000 10000
+
+run 1
+
+variable PE equal pe
+
+#####################################
+#### SIMULATION DONE
+print "All done"
+print "H(0K) = ${PE} eV"

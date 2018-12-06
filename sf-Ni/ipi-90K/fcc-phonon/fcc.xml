@@ -1,0 +1,24 @@
+<simulation mode="static" verbosity="low">
+   <total_steps> 50000 </total_steps>
+   <prng> <seed> 32342 </seed> </prng>
+   <ffsocket name="lmp" mode="unix" pbc="true">
+        <address> ph-90K </address>
+   </ffsocket>
+   <system>
+        <initialize nbeads="1"> 
+            <file mode="xyz" units="angstrom"> fcc.xyz </file>
+            <cell mode="abc" units="angstrom"> [ 2.59041059e+01, 2.49262007e+01, 2.44226230e+01 ] </cell>
+        </initialize>
+        <forces>
+            <force forcefield="lmp"> </force>
+        </forces>
+        <motion mode="vibrations">
+            <vibrations mode="fd">
+                <pos_shift> 0.0001 </pos_shift>
+                <energy_shift> 0.0001 </energy_shift>
+                <prefix> fcc-90K </prefix>
+                <asr> crystal </asr>
+            </vibrations>
+        </motion>
+    </system>
+</simulation>

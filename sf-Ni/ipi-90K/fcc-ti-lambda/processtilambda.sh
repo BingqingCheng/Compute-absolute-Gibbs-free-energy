@@ -1,0 +1,2 @@
+for a in `seq 0.0 0.1 1.0`; do if [ -e fcc-90K-$a.out ]; then tail -n +500 fcc-90K-$a.out | awk -v a=$a '!/#/{print ($6-$7)*27.211385}' | autocorr -maxlag 10 | head -n 1 | awk -v a=$a '{print a,$2,$6}'; fi; done > fcc.dhdl
+cat fcc.dhdl | awk 'BEGIN{sum=0.0; sumerror=0.0; start=0.0; value=0.0; valueerror=0.0;}{end=$1; print start, end, value, $2; sum+=(value+$2)*(end-start)/2.; sumerror+=($3^2+valueerror^2)*(end-start)/2; start=end; value=$2;valueerror=$3;}END{printf("fcc (eV) %f %f \n", sum, sqrt(sumerror))}'

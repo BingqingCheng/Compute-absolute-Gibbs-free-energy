@@ -1,0 +1,60 @@
+# Input file for Stack Fault Energy surface of Nickel
+# Richard Glaze, 2014
+# --------------------- INITIALIZAITION ---------------------
+clear
+units		metal
+dimension	3
+boundary	p p p
+atom_style	atomic
+variable latparam1 equal 2.85532463
+variable atomradius equal sqrt(3)/4
+variable xdim equal 5
+variable ydim equal 5
+variable zdim equal 5
+
+variable systemp equal 0
+
+# --------------------- ATOM DEFINITION ---------------------
+lattice		bcc ${latparam1}
+region		simbox block 0 ${xdim} 0 ${ydim} 0 ${zdim}
+create_box 	1 simbox
+lattice bcc ${latparam1} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+create_atoms	1 region simbox
+
+# ------------------- To create a vacancy ------------------
+#region vacancy sphere 1 1 1 ${atomradius} units lattice
+#delete_atoms region vacancy compress yes
+
+#---------------------To create an interstitial --------------
+#create_atoms 1 single 3.0 3.5 3.5 units lattice 
+
+change_box all x final 0.0 14.37 y final 0.0 14.37 z final 0.0 14.37 remap units box
+
+# --------------------- FORCE FIELDS ---------------------
+# ---------- Define Interatomic Potential --------------------- 
+pair_style	eam/alloy
+pair_coeff * * ../FeCuNi.eam.alloy Fe
+
+neighbor    0.3 bin                ## define parameters for neighbor list
+neigh_modify    delay 0 every 1 check yes
+
+thermo 1
+thermo_style custom step temp pe enthalpy lx ly lz atoms press pxx pyy pzz pxy pyz pxz
+
+# ---------- EQUILIBRATION -------------------------
+fix 1 all box/relax aniso 0.0 vmax 0.0001
+min_style cg
+minimize 1e-20 1e-20 10000 10000
+min_style sd
+minimize 1e-40 1e-40 10000 10000
+unfix 1
+
+reset_timestep 0
+run 1
+
+variable PE equal pe
+
+#####################################
+## SIMULATION DONE
+print "All done"
+print "H(0K) = ${PE} eV"
