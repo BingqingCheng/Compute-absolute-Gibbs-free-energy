@@ -5,7 +5,6 @@ Computing the absolute Gibbs free energy in atomistic simulations: Applications 
 B Cheng, M Ceriotti (2018)
 Physical Review B 97 (5), 054102
 
-This repository contains detailed instructions, input files and data analysis Jupyter notebooks for performing free energy calculations using the thermodynamic integration method
 
 ### We use LAMMPS code together with i-PI
 * LAMMPS: https://lammps.sandia.gov/
