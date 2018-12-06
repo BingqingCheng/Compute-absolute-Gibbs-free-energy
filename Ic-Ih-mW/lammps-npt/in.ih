@@ -1,0 +1,80 @@
+units          real   # units of energy kcal/mol, distance angstrom and time if femtosecond
+atom_style     full   # do not change
+boundary       p p p  # periodic boundary conditions in x y z 
+
+variable latparam1 equal 6.358
+variable xdim equal ${latparam1}*sqrt(6)/2*4
+variable ydim equal ${latparam1}*sqrt(2)/2*6
+variable cutlayer equal 1
+variable zcut equal ${latparam1}/sqrt(3)*(${cutlayer})
+variable zcut2 equal ${latparam1}/sqrt(3)*(${cutlayer}*2)
+variable zcut3 equal ${latparam1}/sqrt(3)*(${cutlayer}*2*3)
+variable zdim equal ${latparam1}/sqrt(3)*(${cutlayer}*2*3+3)
+
+pair_style     sw     # type of interaction potential  
+
+variable temper equal TEMPERATURE
+
+lattice         diamond ${latparam1}
+region          1 block -.001 ${xdim} -.001 ${ydim} -.001 ${zcut} units box
+region          2 block -.001 ${xdim} -.001 ${ydim} ${zcut} ${zcut2} units box
+region          whole block 0 ${xdim} 0 ${ydim} 0 ${zcut2} units box
+#the -.001 in the -x and -y and lower limit of region 1 are only to overcome a simple numerical issue but can be considered 0
+create_box      1 whole
+lattice diamond ${latparam1} orient x 1 1 2 orient y -1 1 0 orient z -1 -1 1 origin 0.5 0.5 0.5
+create_atoms    1 region 1
+lattice diamond ${latparam1} orient x -1 -1 -2 orient y 1 -1 0 orient z -1 -1 1 origin 0.25 0.5 0.5
+create_atoms    1 region 2
+
+mass 1  18.015
+
+replicate 1 1 9
+
+newton         on               # do not change
+pair_coeff     *  *  mW.sw Si   # reading the parameters of the potential 
+
+neighbor       2.0 bin          # neighbor list skin width
+neigh_modify   every 2 delay 4 check yes # frequency to update neighor list
+
+fix relax all box/relax aniso 0.0 vmax 0.0001
+
+min_style cg
+minimize 1e-20 1e-20 10000 10000
+
+min_style sd
+minimize 1e-40 1e-40 10000 10000
+
+unfix relax
+
+reset_timestep 0
+
+thermo 1
+thermo_style custom step pe
+
+dump 1 all xyz 2 mW-Ih.xyz
+dump_modify 1 element Si
+
+run 1
+write_data mW-Ih.data
+
+undump 1
+
+timestep       5     # time step for the integration of the equations of motion, in femtoseconds 
+
+reset_timestep  0   # move the zero of time in the output to the value indicated there (if not needed, comment it)
+thermo_style   custom step temp pe etotal press lx ly lz enthalpy   # energy and thermo properties printed to output
+#thermo_modify  flush yes  # flush the buffer and write the output in real time
+thermo         100  # how often (in steps) will write the properties of thermo_style to the output
+
+velocity        all create ${temper} 2148459 rot yes mom yes dist gaussian # assign initial velocities to the particles
+restart         1000000  restart   # write a binary restart file every XXX steps  
+
+fix 		1 all npt temp ${temper} ${temper} 100.0 x 1.0 1.0 1000.0 y 1.0 1.0 1000.0 z 1.0 1.0 1000.0
+
+dump            2 all custom 1000  water.lammpstrj id x y z # dump configuration into a trajectory file
+
+run              10000000
+unfix           1        # undo the fix 1, need to do this if it will be followed by another run
+undump          2
+
+write_restart   restart.end  # write a binary restart file at the end of the simulation

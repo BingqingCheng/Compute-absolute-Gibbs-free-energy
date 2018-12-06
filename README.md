@@ -15,15 +15,15 @@ This repository contains detailed instructions, input files and data analysis Ju
 
     $ cd lammps-0K
 
-    $ lmp < vancancy.lj
+    $ lmp < vancancy.lmp
 
-    $ lmp < bcc.lj
+    $ lmp < bcc.lmp
 
     $ cd ..
 
 * Go the the lammps-npt directory and run npt calculations at different temperatures
 
-    $ lmp < bcc.lj &> log.lammps &
+    $ lmp < bcc.lmp &> log.lammps &
 
 * Compute the equilibrium cell size at a low temperture T_0 and use this cell size to run phonon/NVT calculations using i-pi
 
@@ -33,7 +33,7 @@ This repository contains detailed instructions, input files and data analysis Ju
 
     $ i-pi input.xml &> ipi.log &
 
-    $ lmp < bcc.lj &> log.lammps &
+    $ lmp < bcc.lmp &> log.lammps &
 
 * Copy the Hessian matrix computed from the phonon mode analysis to the bcc-har directory. This matrix is used to specify the Debye force field
 
@@ -45,8 +45,22 @@ This repository contains detailed instructions, input files and data analysis Ju
 
     $ i-pi input.xml &> ipi.log &
 
-    $ lmp < bcc.lj &> log.lammps &
+    $ lmp < bcc.lmp &> log.lammps &
 
 ## Example 2: Stacking fault free energy in FCC nickel
+
+* Same workflow as Example 1.
+
+## Example 3: Stacking fault free energy in FCC iron
+
+* Same workflow as Example 1.
+
+
+## Example 4: Stacking fault free energy in FCC cobalt
+
+* Same workflow as Example 1.
+
+
+## Example 5: Chemical potential difference between cubic (Ic) and hexagonal ice using the mW water model
 
 * Same workflow as Example 1.

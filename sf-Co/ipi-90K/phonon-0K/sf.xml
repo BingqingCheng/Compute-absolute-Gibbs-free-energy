@@ -1,0 +1,24 @@
+<simulation mode="static" verbosity="low">
+   <total_steps> 5000 </total_steps>
+   <prng> <seed> 32342 </seed> </prng>
+   <ffsocket name="lmp" mode="unix" pbc="true">
+        <address> lmp-sf-0K </address>
+   </ffsocket>
+   <system>
+        <initialize nbeads="1"> 
+            <file mode="xyz" units="angstrom"> sf.xyz </file>
+            <cell mode="abc" units="angstrom"> [ 26.189612, 25.200966, 22.575853 ] </cell>
+        </initialize>
+        <forces>
+            <force forcefield="lmp"> </force>
+        </forces>
+        <motion mode="vibrations">
+            <vibrations mode="fd">
+                <pos_shift> 0.001 </pos_shift>
+                <energy_shift> 0.001 </energy_shift>
+                <prefix> sf-0K </prefix>
+                <asr> crystal </asr>
+            </vibrations>
+        </motion>
+    </system>
+</simulation>

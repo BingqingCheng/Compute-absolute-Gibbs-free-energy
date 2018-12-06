@@ -1,0 +1,18 @@
+# --------------------- INITIALIZAITION ---------------------
+units          real   # units of energy kcal/mol, distance angstrom and time if femtosecond
+atom_style     full   # do not change
+boundary       p p p  # periodic boundary conditions in x y z
+
+read_data      mW-Ic.data 
+pair_style     sw     # type of interaction potential
+
+newton         on               # do not change
+pair_coeff     *  *  mW.sw Si   # reading the parameters of the potential
+
+neighbor       2.0 bin          # neighbor list skin width
+neigh_modify   every 1 delay 0 check yes # frequency to update neighor list
+
+fix 1 all ipi ic-90K 32346 unix
+
+run		100000000
+

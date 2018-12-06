@@ -1,0 +1,10 @@
+# 0K
+fcc 27.0427 , 26.0218 , 25.4961 
+sf 27.0427, 26.0218, 23.3714 
+
+
+# 90K
+fcc 2.7041843e+01 2.6021294e+01 2.5495547e+01
+sf 2.7042155e+01 2.6021307e+01 2.3370975e+01
+
+# the difference is very small so I'll just use the 0K cell size
